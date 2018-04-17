@@ -14,44 +14,14 @@ import {
 	ActivityIndicator
 } from "react-native";
 import { StackNavigator } from "react-navigation";
+import { Router, Scene, Stack } from "react-native-router-flux";
 
 import Login from "./Login";
 import CheckIn from "./CheckIn";
-
-class AppNavigation extends Component<{}> {
-	constructor(props) {
-		super(props);
-		this.getNavigator.bind(this);
-	}
-
-	getNavigator() {
-		const Navigator = StackNavigator(
-			{
-				Login: {
-					screen: Login,
-					navigationOptions: {
-						headerLeft: null
-					}
-				},
-				CheckIn: {
-					screen: CheckIn,
-					navigationOptions: {
-						headerLeft: null
-					}
-				}
-			},
-			{
-				initialRouteName: this.props.initialRouteName
-			}
-		);
-		return <Navigator />;
-	}
-
-	render() {
-		//let StackNavigator = this.StackNavigator;
-		return this.getNavigator();
-	}
-}
+import SignUpName from "./SignUpName";
+import SignUpEmail from "./SignUpEmail";
+import SignUpPassword from "./SignUpPassword";
+import Main from "./Main";
 
 class App extends Component<{}> {
 	constructor(props) {
@@ -78,9 +48,48 @@ class App extends Component<{}> {
 	render() {
 		if (this.state.isLoaded) {
 			return (
-				<AppNavigation
-					initialRouteName={this.state.hasToken ? "CheckIn" : "Login"}
-				/>
+				<Router>
+					<Scene key="root">
+						<Scene
+							key="main"
+							component={Main}
+							title="Main"
+							initial={!this.state.hasToken}
+							hideNavBar="true"
+						/>
+						<Scene
+							key="login"
+							component={Login}
+							title="Login"
+							hideNavBar="true"
+						/>
+						<Scene
+							key="signupname"
+							component={SignUpName}
+							title="SignUpName"
+							hideNavBar="true"
+						/>
+						<Scene
+							key="signupemail"
+							component={SignUpEmail}
+							title="SignUpEmail"
+							hideNavBar="true"
+						/>
+						<Scene
+							key="signuppassword"
+							component={SignUpPassword}
+							title="SignUpPassword"
+							hideNavBar="true"
+						/>
+						<Scene
+							key="checkin"
+							component={CheckIn}
+							title="CheckIn"
+							hideNavBar="true"
+							initial={this.state.hasToken}
+						/>
+					</Scene>
+				</Router>
 			);
 		}
 		return (
@@ -92,22 +101,3 @@ class App extends Component<{}> {
 }
 
 export default App;
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#F5FCFF"
-	},
-	welcome: {
-		fontSize: 20,
-		textAlign: "center",
-		margin: 10
-	},
-	instructions: {
-		textAlign: "center",
-		color: "#333333",
-		marginBottom: 5
-	}
-});

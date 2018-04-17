@@ -17,6 +17,9 @@ import jwt_decode from "jwt-decode";
 import PushNotification from "react-native-push-notification";
 import haversine from "haversine";
 import BackgroundGeolocation from "react-native-mauron85-background-geolocation";
+import LinearGradient from "react-native-linear-gradient";
+import Icon from "react-native-vector-icons/SimpleLineIcons";
+import { Actions } from "react-native-router-flux";
 
 export default class CheckIn extends Component<{}> {
 	static navigationOptions = {
@@ -30,13 +33,15 @@ export default class CheckIn extends Component<{}> {
 			currentTime: null,
 			address: null,
 			error: null,
-			name: "",
+			name: this.props.firstName,
+			email: this.props.email,
 			userId: null,
 			entryId: "",
 			isCheckedIn: null,
 			shouldCheckIn: null,
 			checkInTime: null,
-			elapsedTime: null
+			elapsedTime: null,
+			hours: null
 		};
 		this.getLocation = this.getLocation.bind(this);
 		this.checkInEmployee = this.checkInEmployee.bind(this);
@@ -47,7 +52,6 @@ export default class CheckIn extends Component<{}> {
 	}
 
 	componentDidMount() {
-		console.log(this.state);
 		PushNotification.configure({
 			onNotification: function(notification) {
 				console.log("NOTIFICATION:", notification);
@@ -149,6 +153,9 @@ export default class CheckIn extends Component<{}> {
 				checkInTime
 			});
 		});
+
+		var hours = new Date().getHours();
+		this.setState({ hours });
 	}
 
 	componentWillUnmount() {
@@ -206,6 +213,7 @@ export default class CheckIn extends Component<{}> {
 	checkInEmployee() {
 		const checkInData = {
 			name: this.state.name,
+			email: this.state.email,
 			location: this.state.address,
 			time: moment().format()
 		};
@@ -291,14 +299,13 @@ export default class CheckIn extends Component<{}> {
 	}
 
 	logout() {
-		const { navigate } = this.props.navigation;
 		PushNotification.cancelAllLocalNotifications();
 		BackgroundGeolocation.stop();
 		AsyncStorage.multiRemove(["jwt", "name"], (err, success) => {
 			if (err) {
 				console.log(err);
 			} else {
-				navigate("Login");
+				Actions.reset("login");
 			}
 		});
 	}
@@ -329,61 +336,63 @@ export default class CheckIn extends Component<{}> {
 
 	render() {
 		return (
-			<View style={styles.checkInView}>
-				<View style={styles.dateBox}>
-					<Text style={styles.date}>
-						{moment().format("dddd, MMMM Do YYYY")}
-					</Text>
-					<Text style={styles.time}>{this.state.currentTime}</Text>
-
-					{this.state.address ? (
+			<LinearGradient
+				colors={["#3498DB", "#ffffff"]}
+				start={{ x: 0.0, y: 0.39 }}
+				locations={[0.5, 0.5]}
+				style={{ flex: 1 }}
+			>
+				<View style={styles.checkInView}>
+					<View style={styles.greeting}>
 						<Text
 							style={{
-								textAlign: "center",
-								margin: 5,
-								color: "black"
-								//opacity: 0.8
+								fontSize: 48,
+								color: "#ffffff",
+								textAlign: "center"
 							}}
 						>
-							<Text
-								style={{
-									fontWeight: "bold"
-								}}
-							>
-								Current Location:
-							</Text>{" "}
-							{this.state.address}
+							Good{" "}
+							{this.state.hours >= 12 ? "Afternoon " : "Morning "}
+							Tolu!
 						</Text>
-					) : (
-						<View style={{ flexDirection: "row" }}>
+					</View>
+					<View style={styles.dateBox}>
+						<Text style={styles.date}>
+							{moment().format("dddd, MMMM Do YYYY")}
+						</Text>
+						<Text style={styles.time}>
+							{this.state.currentTime}
+						</Text>
+						{this.state.address ? (
 							<Text
 								style={{
-									fontFamily: "Helvetica-Light",
-									fontWeight: "bold",
-									color: "black"
+									textAlign: "center",
+									margin: 5,
+									color: "white"
 									//opacity: 0.8
 								}}
 							>
-								Current Location:{" "}
+								{this.state.address}
 							</Text>
-							<ActivityIndicator size="small" color="black" />
-						</View>
-					)}
-					<Text style={{ fontFamily: "Helvetica", opacity: 0.8 }}>
-						{this.state.checkInTime ? (
-							"Checked in " +
-							moment(this.state.checkInTime).fromNow()
 						) : (
-							undefined
+							<View style={{ flexDirection: "row" }}>
+								<Icon
+									name="location-pin"
+									size={20}
+									color="white"
+								/>
+								<Text
+									style={{
+										color: "white",
+										fontSize: 18,
+										textAlign: "center"
+									}}
+								>
+									56a Adeola Odeku, Victoria Island Lagos
+								</Text>
+							</View>
 						)}
-					</Text>
-
-					{/*<TouchableOpacity onPress={this.getAddress}>
-						<Text style={{ color: "blue" }}>Refresh Location</Text>
-					</TouchableOpacity>*/}
-				</View>
-
-				<View style={styles.buttons}>
+					</View>
 					<View>
 						{this.state.error ? (
 							<Text>{this.state.error}</Text>
@@ -391,61 +400,69 @@ export default class CheckIn extends Component<{}> {
 							undefined
 						)}
 					</View>
-					<TouchableOpacity
-						style={
-							this.state.isCheckedIn ? (
-								styles.disabledButton
-							) : (
-								styles.checkInButton
-							)
-						}
-						onPress={this.checkInEmployee}
-						disabled={this.state.isCheckedIn}
-					>
+					<View style={styles.buttons}>
+						<TouchableOpacity
+							style={
+								this.state.isCheckedIn
+									? styles.checkInButton
+									: styles.checkInButton
+							}
+							onPress={this.checkInEmployee}
+							disabled={this.state.isCheckedIn}
+						>
+							<Text
+								style={{
+									textAlign: "center",
+									color: "#3498db",
+									fontWeight: "bold"
+								}}
+							>
+								CHECK IN
+							</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={
+								this.state.isCheckedIn
+									? styles.checkOutButton
+									: styles.checkOutButton
+							}
+							onPress={this.checkOutEmployee}
+							disabled={!this.state.isCheckedIn}
+						>
+							<Text
+								style={{
+									textAlign: "center",
+									color: "white",
+									fontWeight: "bold"
+								}}
+							>
+								CHECK OUT
+							</Text>
+						</TouchableOpacity>
+					</View>
+					<View style={{ marginTop: 20 }}>
 						<Text
 							style={{
-								textAlign: "center",
-								color: "white"
+								fontFamily: "Helvetica",
+								opacity: 0.8
 							}}
 						>
-							Check In
+							{this.state.checkInTime
+								? "Checked in " +
+								  moment(this.state.checkInTime).fromNow()
+								: undefined}
 						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={
-							this.state.isCheckedIn ? (
-								styles.checkOutButton
-							) : (
-								styles.disabledButton
-							)
-						}
-						onPress={this.checkOutEmployee}
-						disabled={!this.state.isCheckedIn}
-					>
-						<Text
-							style={{
-								textAlign: "center",
-								color: "white"
-							}}
+					</View>
+					<View style={styles.logout}>
+						<TouchableOpacity
+							//style={styles.logoutButton}
+							onPress={this.logout}
 						>
-							Check Out
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.logoutButton}
-						onPress={this.logout}
-					>
-						<Text
-							style={{
-								textAlign: "center",
-								color: "white"
-							}}
-						>
-							Log Out
-						</Text>
-					</TouchableOpacity>
+							<Icon name="logout" size={60} color="#3498DB" />
+						</TouchableOpacity>
+					</View>
 				</View>
-			</View>
+			</LinearGradient>
 		);
 	}
 }
@@ -453,52 +470,56 @@ export default class CheckIn extends Component<{}> {
 const styles = StyleSheet.create({
 	checkInView: {
 		flex: 1,
-		flexDirection: "column",
+
+		alignItems: "center"
+	},
+	greeting: {
+		marginTop: 50,
+		alignItems: "center",
 		justifyContent: "center",
-		backgroundColor: "white"
-		//alignItems: "center"
+		height: 125
 	},
 	dateBox: {
-		flex: 1,
-		justifyContent: "center",
+		marginTop: 50,
 		alignItems: "center"
 	},
 	date: {
 		fontFamily: "Helvetica",
 		fontSize: 36,
-		margin: 10,
 		textAlign: "center",
-		color: "black"
-		//opacity: 0.9
+		color: "white"
 	},
 	time: {
 		fontFamily: "Helvetica-Light",
-		fontSize: 50,
-		margin: 10,
-		color: "black"
+		fontSize: 48,
+		color: "white",
+		height: 75
 	},
 	buttons: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center"
+		width: "100%",
+		flexDirection: "row",
+		justifyContent: "space-around",
+		marginTop: 60
 	},
 	checkInButton: {
-		backgroundColor: "#0DCF45",
-		width: 300,
+		elevation: 4,
+		width: 150,
 		height: 50,
 		borderRadius: 50,
+		borderColor: "#ffffff",
 		justifyContent: "center",
 		alignItems: "center",
-		margin: 10
+		backgroundColor: "#ffffff"
 	},
 	checkOutButton: {
-		backgroundColor: "red",
-		width: 300,
+		elevation: 4,
+		width: 150,
 		height: 50,
 		borderRadius: 50,
+		borderColor: "#ffffff",
 		justifyContent: "center",
 		alignItems: "center",
-		margin: 10
+		backgroundColor: "#3498DB"
 	},
 	disabledButton: {
 		backgroundColor: "#c9c9c9",
@@ -509,13 +530,12 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		margin: 10
 	},
-	logoutButton: {
-		backgroundColor: "black",
-		width: 300,
-		height: 50,
-		borderRadius: 50,
-		justifyContent: "center",
-		alignItems: "center",
-		margin: 10
+	logout: {
+		flexDirection: "row",
+		width: "100%",
+		alignItems: "flex-start",
+		//width: "100%",
+		marginTop: 50,
+		marginLeft: 50
 	}
 });

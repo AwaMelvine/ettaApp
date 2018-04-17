@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-vector-icons')
     compile project(':react-native-mauron85-background-geolocation')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-push-notification')
