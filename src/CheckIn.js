@@ -202,6 +202,7 @@ export default class CheckIn extends Component<{}> {
 		}
 	}
 
+
 	async getLocation(positionCoords) {
 		const { latitude, longitude } = positionCoords;
 		const searchURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${latitude},${longitude}&key=AIzaSyCU_XbSzFXulw_pi1HQ9qbKKH9LyUSyoeM`;
@@ -212,15 +213,16 @@ export default class CheckIn extends Component<{}> {
 
 	checkInEmployee() {
 		const checkInData = {
-			name: this.state.name,
-			email: this.state.email,
-			location: this.state.address,
+			// name: this.props.firstName,
+			email: this.state.name,
+			location: "this.state.address",
 			time: moment().format()
 		};
 		this.setState({ error: null });
 		const json = JSON.stringify(checkInData);
+		console.log(checkInData);
 		AsyncStorage.getItem("jwt", (err, token) => {
-			fetch("https://peaceful-castle-10340.herokuapp.com/checkin", {
+			fetch("https://checkin-node-app.herokuapp.com/checkin", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -269,7 +271,7 @@ export default class CheckIn extends Component<{}> {
 				userId: userId,
 				time: checkOutTime
 			});
-			fetch("https://peaceful-castle-10340.herokuapp.com/checkout", {
+			fetch("https://checkin-node-app.herokuapp.com/checkout", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

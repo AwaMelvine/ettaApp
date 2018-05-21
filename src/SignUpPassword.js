@@ -43,7 +43,7 @@ export default class SignUpPassword extends Component<Props> {
     }
     this.setState({ error: "" });
     const json = JSON.stringify(data);
-    fetch("https://peaceful-castle-10340.herokuapp.com/register", {
+    fetch("https://checkin-node-app.herokuapp.com/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,6 +61,7 @@ export default class SignUpPassword extends Component<Props> {
             name: this.state.name,
             email: this.state.email
           });
+          navigate("checkin", { username: this.state.email });
         }
         this.setState({ hasLoaded: true });
       })

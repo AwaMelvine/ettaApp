@@ -39,11 +39,11 @@ export default class Login extends Component<{}> {
 		Keyboard.dismiss();
 		const { navigate } = this.props.navigation;
 		const data = {
-			email: this.state.email.trim(),
+			username: this.state.email.trim(),
 			password: this.state.password.trim()
 		};
 
-		if (data.email.length === 0) {
+		if (data.username.length === 0) {
 			return this.setState({
 				error: "Username cannot be null"
 			});
@@ -55,8 +55,10 @@ export default class Login extends Component<{}> {
 		}
 		this.setState({ error: "" });
 
+		console.log(data);
+
 		const json = JSON.stringify(data);
-		fetch("https://peaceful-castle-10340.herokuapp.com/login", {
+		fetch("https://checkin-node-app.herokuapp.com/login", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -73,7 +75,7 @@ export default class Login extends Component<{}> {
 						["jwt", res.token],
 						["name", this.state.email]
 					]);
-					navigate("CheckIn", { username: this.state.email });
+					navigate("checkin", { username: this.state.email });
 				}
 				this.setState({ hasLoaded: true });
 			})

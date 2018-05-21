@@ -4,7 +4,8 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.marianhello.react.BackgroundGeolocationPackage;
+// import com.marianhello.react.BackgroundGeolocationPackage;
+import com.marianhello.bgloc.react.BackgroundGeolocationPackage;  // <--- Import Package
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.ReactNativeHost;
