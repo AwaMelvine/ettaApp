@@ -43,7 +43,7 @@ export default class CheckIn extends Component<{}> {
 			elapsedTime: null,
 			hours: null
 		};
-		this.getLocation = this.getLocation.bind(this);
+		// this.getLocation = this.getLocation.bind(this);
 		this.checkInEmployee = this.checkInEmployee.bind(this);
 		this.checkOutEmployee = this.checkOutEmployee.bind(this);
 		this.getUserId = this.getUserId.bind(this);
@@ -51,7 +51,8 @@ export default class CheckIn extends Component<{}> {
 		//this.getAddress = this.getAddress.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
+		console.log('component did mount')
 		PushNotification.configure({
 			onNotification: function(notification) {
 				console.log("NOTIFICATION:", notification);
@@ -108,7 +109,7 @@ export default class CheckIn extends Component<{}> {
 		// you can also just start without checking for status
 		BackgroundGeolocation.start();
 
-		BackgroundGeolocation.on("location", location => {
+		BackgroundGeolocation.on("location", async location => {
 			console.log(location);
 			const positionCoords = {
 				latitude: location.latitude,
@@ -129,10 +130,10 @@ export default class CheckIn extends Component<{}> {
 			} else {
 				this.setState({ shouldCheckIn: false });
 			}
-			this.getLocation(positionCoords).then(address => {
-				console.log(address);
-				this.setState({ address });
-			});
+			const address = await this.getLocation(positionCoords);
+			console.log(address, positionCoords);
+			this.setState({ address });
+
 		});
 
 		// Set timer for clock
@@ -203,11 +204,12 @@ export default class CheckIn extends Component<{}> {
 	}
 
 
-	async getLocation(positionCoords) {
+	async getLocation = (positionCoords) => {
 		const { latitude, longitude } = positionCoords;
 		const searchURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${latitude},${longitude}&key=AIzaSyCU_XbSzFXulw_pi1HQ9qbKKH9LyUSyoeM`;
 		const response = await fetch(searchURL);
 		const json = await response.json();
+		console.log('json', json);
 		return json.results[0].formatted_address;
 	}
 
@@ -215,7 +217,7 @@ export default class CheckIn extends Component<{}> {
 		const checkInData = {
 			// name: this.props.firstName,
 			email: this.state.name,
-			location: "this.state.address",
+			location: this.state.address,
 			time: moment().format()
 		};
 		this.setState({ error: null });
