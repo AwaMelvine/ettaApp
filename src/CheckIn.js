@@ -204,7 +204,7 @@ export default class CheckIn extends Component<{}> {
 	}
 
 
-	async getLocation = (positionCoords) => {
+	getLocation = async (positionCoords) => {
 		const { latitude, longitude } = positionCoords;
 		const searchURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${latitude},${longitude}&key=AIzaSyCU_XbSzFXulw_pi1HQ9qbKKH9LyUSyoeM`;
 		const response = await fetch(searchURL);
